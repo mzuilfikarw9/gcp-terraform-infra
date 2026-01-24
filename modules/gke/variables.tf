@@ -1,29 +1,25 @@
 variable "project_id" {
-  description = "The GCP Project ID"
-  type        = string
-}
-
-variable "env_name" {
-  description = "The environment name"
-  type        = string
+  type = string
 }
 
 variable "region" {
-  description = "GCP Region"
-  type        = string
+  type = string
 }
 
-variable "vpc_name" {
-  description = "Name of the VPC to deploy into"
-  type        = string
+variable "env_name" {
+  type = string
 }
 
-variable "subnet_name" {
-  description = "Name of the Subnet to deploy into"
+variable "vpc_id" {
   type        = string
+  description = "The ID of the VPC created by the network module"
+}
+
+variable "subnet_id" {
+  type        = string
+  description = "The ID of the Subnet created by the network module"
 }
 
 variable "node_service_account" {
-  description = "Email of the Service Account for GKE nodes"
-  type        = string
+  type = string
 }
