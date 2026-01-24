@@ -17,8 +17,10 @@ spec:
       - name: hello-world
         image: paulbouwer/hello-kubernetes:1.10
         ports:
-        - containerPort: 8080
+        - containerPort: 8081  # <--- CHANGED FROM 8080
         env:
+        - name: PORT           # <--- TELL APP TO USE 8081
+          value: "8081"
         - name: MESSAGE
           valueFrom:
             configMapKeyRef:
