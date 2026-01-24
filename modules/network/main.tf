@@ -35,6 +35,25 @@ resource "google_compute_router_nat" "nat" {
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 }
 
-# Outputs to pass to GKE module
-output "vpc_name" { value = google_compute_network.vpc.name }
+# 1. Reserve an internal IP range for Google services
+resource "google_compute_global_address" "private_ip_address" {
+  name          = "google-managed-services-range"
+  purpose       = "VPC_PEERING"
+  address_type  = "INTERNAL"
+  prefix_length = 16
+  # FIXED: Changed .main to .vpc
+  network       = google_compute_network.vpc.id 
+}
+
+# 2. Create the private connection (VPC Peering)
+resource "google_service_networking_connection" "private_vpc_connection" {
+  # FIXED: Changed .main to .vpc
+  network                 = google_compute_network.vpc.id
+  service                 = "servicenetworking.googleapis.com"
+  reserved_peering_ranges = [google_compute_global_address.private_ip_address.name]
+}
+
+# Outputs to pass to GKE and Database modules
+output "vpc_name"   { value = google_compute_network.vpc.name }
+output "vpc_id"     { value = google_compute_network.vpc.id } # Add this line
 output "subnet_name" { value = google_compute_subnetwork.subnet.name }
