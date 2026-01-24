@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hello-world-config
+  namespace: default
+data:
+  APP_MESSAGE: "SIT Environment: Config managed by ConfigMap!"
+  APP_COLOR: "blue"

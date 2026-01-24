@@ -20,4 +20,7 @@ spec:
         - containerPort: 8080
         env:
         - name: MESSAGE
-          value: "SIT Environment: Infrastructure and App in one Repo!"
+          valueFrom:
+            configMapKeyRef:
+              name: hello-world-config
+              key: APP_MESSAGE
