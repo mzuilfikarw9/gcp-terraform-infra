@@ -3,22 +3,27 @@ kind: Ingress
 metadata:
   name: ticket-ingress
   annotations:
-    kubernetes.io/ingress.class: {{ .Values.ingress.className | quote }}
+    # Rewrite target is not needed for simple root paths, but good for APIs if needed
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
+  ingressClassName: nginx  # <--- Explicitly sets the class
   rules:
-  - http:
-      paths:
-      - path: /api
-        pathType: Prefix
-        backend:
-          service:
-            name: ticket-backend
-            port:
-              number: {{ .Values.backend.service.port }}
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: ticket-frontend
-            port:
-              number: {{ .Values.frontend.service.port }}
+    - http:
+        paths:
+          # 1. Backend API Traffic (Goes to Backend Service)
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.backend.service.name | default "ticket-backend" }}
+                port:
+                  number: 80
+          
+          # 2. Frontend Traffic (Goes to Frontend Service)
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.frontend.service.name | default "ticket-frontend" }}
+                port:
+                  number: 80

@@ -1,9 +1,10 @@
 # Global settings
 ingress:
   enabled: true
-  className: "nginx"
-  # Optional: You can put your specific IP here if you want to restrict it
-  # host: "34.87.157.137.nip.io"
+  # We use "gce" because that is the default Google Controller you are using
+  className: "gce"
+  annotations:
+    kubernetes.io/ingress.class: "gce"
 
 # Backend Configuration
 backend:
@@ -13,7 +14,9 @@ backend:
     tag: "v1"
     pullPolicy: IfNotPresent
   service:
-    port: 80
+    type: NodePort       # <--- REQUIRED for GKE Ingress
+    port: 80             # Service Port
+    targetPort: 8080     # <--- FIXED: Matches your Go App's port
   env:
     kafkaBroker: "kafka-service:9092" 
 
@@ -21,8 +24,10 @@ backend:
 frontend:
   replicaCount: 1
   image:
-    repository: gcr.io/my-company-sit-platform/ticket-backend
+    repository: "gcr.io/my-company-sit-platform/ticket-frontend" # <--- FIXED: Was pointing to backend!
     tag: "v1"
     pullPolicy: IfNotPresent
   service:
-    port: 80
+    type: NodePort       # <--- REQUIRED for GKE Ingress
+    port: 80             # Service Port
+    targetPort: 80       # Matches Nginx Port
