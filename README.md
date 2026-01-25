@@ -220,10 +220,10 @@ If looks like the authentication process was interrupted or the permissions were
 Force Clean Login (No Browser)
 ```
 gcloud auth application-default login --no-browser --scopes=https://www.googleapis.com/auth/cloud-platform #
-It will print a long URL starting with https://accounts.google.com/...
 ```
+** It will print a long URL starting with https://accounts.google.com/...
 
-## Copy that full URL and paste it into your web browser.
+Step 1: Copy that full URL and paste it into your web browser.
 Log in with your account.
 CRITICAL: When asked for permission, you MUST check the box that says:
 
