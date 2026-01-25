@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ticket-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ticket-frontend
+  template:
+    metadata:
+      labels:
+        app: ticket-frontend
+    spec:
+      containers:
+      - name: web
+        image: node:22-alpine
+        # This command creates a React app and runs it
+        command: ["/bin/sh", "-c"]
+        args:
+          - echo "Building Frontend..." &&
+            npm create vite@latest my-app -- --template react &&
+            cd my-app &&
+            npm install &&
+            npm install axios &&
+            cp /custom/App.jsx src/App.jsx && 
+            npm run dev -- --host 0.0.0.0
+        ports:
+        - containerPort: 5173 
+        volumeMounts:
+        - name: custom-code
+          mountPath: /custom
+      volumes:
+      - name: custom-code
+        configMap:
+          name: frontend-code
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ticket-frontend
+spec:
+  selector:
+    app: ticket-frontend
+  ports:
+  - port: 80
+    targetPort: 5173

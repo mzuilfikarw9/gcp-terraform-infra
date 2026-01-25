@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ticket-frontend
+  labels:
+    app: ticket-frontend
+spec:
+  type: ClusterIP
+  selector:
+    app: ticket-frontend
+  ports:
+    - port: 80
+      targetPort: 5173  
+      protocol: TCP
+      name: http

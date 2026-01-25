@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ticket-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    # REMOVED: nginx.ingress.kubernetes.io/rewrite-target
+    # REMOVED: nginx.ingress.kubernetes.io/use-regex
+spec:
+  rules:
+  - http:
+      paths:
+      # 1. Exact match for API traffic
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: ticket-backend
+            port:
+              number: 80
+      # 2. Catch-all for Frontend
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ticket-frontend
+            port:
+              number: 80

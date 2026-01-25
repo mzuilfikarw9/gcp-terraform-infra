@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ticket-backend
+  labels:
+    app: ticket-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ticket-backend
+  template:
+    metadata:
+      labels:
+        app: ticket-backend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: api
+        image: golang:1.23-alpine
+        command: ["/bin/sh", "-c"]
+        args:
+          - mkdir -p /run-app &&
+            cp /app/main.go /run-app/ &&
+            cp /app/go.mod /run-app/ &&
+            cp /app/go.sum /run-app/ &&
+            cd /run-app &&
+            go mod tidy &&
+            go run main.go;
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DB_HOST
+          value: "10.231.0.3"
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: DB_PASSWORD
+        # ... (keep the volumeMounts and volumes exactly the same as before)
+        volumeMounts:
+        - name: source-code
+          mountPath: /app/main.go
+          subPath: main.go
+        - name: gomod
+          mountPath: /app/go.mod
+          subPath: go.mod
+        - name: gosum
+          mountPath: /app/go.sum
+          subPath: go.sum
+      volumes:
+      - name: source-code
+        configMap:
+          name: backend-code
+      - name: gomod
+        configMap:
+          name: backend-gomod
+      - name: gosum
+        configMap:
+          name: backend-gosum
