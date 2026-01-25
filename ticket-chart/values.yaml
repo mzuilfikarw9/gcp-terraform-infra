@@ -1,7 +1,6 @@
 # Global settings
 ingress:
   enabled: true
-  # We use "gce" because that is the default Google Controller you are using
   className: "gce"
   annotations:
     kubernetes.io/ingress.class: "gce"
@@ -14,20 +13,42 @@ backend:
     tag: "v1"
     pullPolicy: IfNotPresent
   service:
-    type: NodePort       # <--- REQUIRED for GKE Ingress
-    port: 80             # Service Port
-    targetPort: 8080     # <--- FIXED: Matches your Go App's port
+    type: NodePort
+    port: 80
+    targetPort: 8080
   env:
     kafkaBroker: "kafka-service:9092" 
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
 
 # Frontend Configuration
 frontend:
   replicaCount: 1
   image:
-    repository: "gcr.io/my-company-sit-platform/ticket-frontend" # <--- FIXED: Was pointing to backend!
+    repository: "gcr.io/my-company-sit-platform/ticket-frontend" 
     tag: "v1"
     pullPolicy: IfNotPresent
   service:
-    type: NodePort       # <--- REQUIRED for GKE Ingress
-    port: 80             # Service Port
-    targetPort: 80       # Matches Nginx Port
+    type: NodePort       
+    port: 80             
+    targetPort: 80       
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+
+# Global Autoscaling Configuration
+# (This must be at the root level, not inside backend/frontend)
+autoscaling:
+  enabled: true
+  minReplicas: 2      # It will immediately scale your apps from 1 to 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
