@@ -18,3 +18,13 @@ spec:
         imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
         ports:
         - containerPort: 80 # This matches the container port (Nginx)
+
+        resources:
+          {{- toYaml .Values.backend.resources | nindent 10 }}
+
+        # 3. PROBES (This keeps the Load Balancer happy)
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 10

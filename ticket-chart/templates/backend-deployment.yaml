@@ -21,3 +21,17 @@ spec:
         env:
         - name: KAFKA_BROKER
           value: {{ .Values.backend.env.kafkaBroker }}
+        - name: DB_HOST
+          value: "10.231.0.3"
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: DB_PASSWORD
+        resources:
+          {{- toYaml .Values.backend.resources | nindent 10 }}
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 10
